@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Etch-A-Sketch</title>
+        <link rel="stylesheet" href="index.css">
+    </head>
+    <body>
+        <div class="header">Etch-A-Sketch</div>
+        <div class="screen">
+            <div class="options text">
+                <input type="color" id="selColor" name="favcolor" value="black">
+               
+                <ul class="typeDraw">
+                    <li>
+                        <input  type="radio" id="selectColor" name="typeDraw" value="solidColor" checked="checked" />
+                         <label for="selectColor">Select Color</label>  
+                    </li>
+
+                    <li>
+                        <input type="radio" id="psychodelic" name="typeDraw" value="rgbColor"/>
+                         <label for="psychodelic">Psychodelic</label>  
+                    </li>
+
+                    <li>
+                        <input type="radio" id="shading" name="typeDraw" value="shadingColor"/>
+                         <label for="shading">Shading</label>  
+                    </li>
+
+                    <li>
+                        <input type="radio" id="eraser" name="typeDraw" value="eraserColor"/>
+                         <label for="eraser">Eraser</label>  
+                    </li>
+
+
+
+                </ul>
+
+                <button class="buttonClear text">Clear</button>
+                <div class="slideContainer pixelRatio">
+                    <input type="range" min="6" max="64" value="20" class="slider" id="myRange">
+                    <div class="textDensity">Pixel Density</div>
+                </div>
+
+            </div>
+           
+
+
+
+            <div class="divContainer"></div>
+        </div>
+        <div class="footer text">
+            <span class="footerText text">Copyright 2023</span>
+            <span class="footerText ">Made by Edis Usein</span>
+        </div>
+
+<script>
+     let pixelColor = "black";
+     let shadingColor = false;
+    let colorIntervalId;
+
+    const container = document.querySelector('.divContainer');
+    const colorPicker = document.querySelector("#selColor")
+    const radioButtons = document.querySelectorAll('input[name="typeDraw"]');
+    const clearButton = document.querySelector(".buttonClear")
+    colorPicker.addEventListener("click",()=>{
+        pixelColor=colorPicker.value;
+    })
+
+
+    function updateColor() {
+        pixelColor = getRandomColor();
+    }
+
+        function getRandomColor() {
+    const red = Math.floor(Math.random() * 256);    
+    const green = Math.floor(Math.random() * 256);   
+    const blue = Math.floor(Math.random() * 256);     
+
+    const color = `rgb(${red}, ${green}, ${blue})`;  
+    return color;
+    }
+    colorPicker.addEventListener("input", function(e){
+     
+                            pixelColor=colorPicker.value;
+    })
+
+    
+    radioButtons.forEach(btn=>btn.addEventListener("click",function()
+    {
+       
+            if (btn.checked) 
+                {
+                    switch(btn.value)
+                    {
+                        case "solidColor":
+                        shadingColor = false;
+                            clearInterval(colorIntervalId); 
+                            pixelColor=colorPicker.value;
+                            break;
+
+                        case "rgbColor":
+                        shadingColor = false;
+                            colorIntervalId = setInterval(updateColor, 50);
+                            break;
+
+                        case "shadingColor":
+                        pixelColor="white";
+                        clearInterval(colorIntervalId); 
+                        shadingColor = true;
+                        break;
+
+                        case "eraserColor":
+                        shadingColor = false;
+                        clearInterval(colorIntervalId); 
+                        pixelColor="white";
+                        break;
+                        }
+                    }
+                
+    }  ))
+   
+    var slider = document.querySelector(".slider");
+    let row=20;
+  
+    
+    let screenWidth=280/row;
+    let numberOfDivs=row*row;
+   
+
+ 
+
+   
+
+    slider.oninput = function() {
+        row = this.value;
+        drawGrid()
+    }
+
+
+    function drawGrid()
+    {
+            screenWidth=280/row;
+            numberOfDivs=row*row;
+            var child = container.lastElementChild; 
+            while (child) {
+                container.removeChild(child);
+                child = container.lastElementChild;
+            }
+        for(let x=0;x<row;x++)
+        {
+            const rows = document.createElement('span');
+        for(let y=0 ; y<row ; y++)
+        {
+            const div = document.createElement('div');
+            div.style.cssText = 'color: blue; background: white;';    
+            div.classList.add("pixel")
+            div.style.padding=screenWidth-1+"px";
+            rows.appendChild(div);
+        }
+            
+            container.appendChild(rows);
+        }
+        const pixels = document.querySelectorAll(".pixel");
+        const description = document.querySelector(".textDensity");
+        description.innerHTML=`Pixel Density: ${row}x${row}`
+        pixels.forEach(pixel=>pixel.addEventListener("mouseover", function (e){
+            if(shadingColor==false)
+        pixel.style.backgroundColor=pixelColor ;
+    else if (shadingColor == true)
+    {
+
+        var currentColor = window.getComputedStyle(pixel).backgroundColor;
+        var rgbArray = currentColor.match(/\d+/g);
+    var r = parseInt(rgbArray[0]);
+    var g = parseInt(rgbArray[1]);
+    var b = parseInt(rgbArray[2]);
+    var darkenAmount = 25;
+r = Math.max(r - darkenAmount, 0);
+g = Math.max(g - darkenAmount, 0);
+b = Math.max(b - darkenAmount, 0);
+pixel.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+    }
+    
+    }))
+    }
+
+    drawGrid();
+
+    clearButton.addEventListener("click",function(e){
+        drawGrid();
+    })   
+
+
+        </script>
+     </body>
+ </html>
